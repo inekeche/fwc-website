@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+theme {
+  --color-church-bg: #F8F9FA;
+  --color-church-sky: #00A8E8;
+  --color-church-skyLight: #E3F2FD;
+  --color-church-purple: #7E57C2;
+  --color-church-purpleLight: #B39DDB;
+  
+  --background-image-church-gradient: linear-gradient(to right, #E3F2FD, #EDE7F6);
+}
