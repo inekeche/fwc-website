@@ -8,5 +8,5 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-  base: '/fwc-website/',
+  base: '/fwc-church/',
 })
