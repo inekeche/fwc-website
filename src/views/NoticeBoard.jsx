@@ -1,62 +1,47 @@
 // src/views/NoticeBoard.jsx
 import React from 'react';
-import EventCard from '../components/EventCard';
 
-const NoticeBoard = () => {
-  // Cleaned up upcoming events data
-  const upcomingEvents = [
-    {
-      id: 1,
-      date: '9',
-      month: ' Sept',
-      title: 'September of Special Services 2026',
-      description: 'All Fellowship Groups ministering in turns throughout the month.'
-    },
-    {
-      id: 2,
-      date: '29',
-      month: 'Nov',
-      title: 'Annual Thanksgiving Service',
-      description: 'Join us to celebrate God who strengthens us throughout the year.'
-    },
-    {
-      id: 3,
-      date: '31',
-      month: 'Dec',
-      title: 'Cross-Over Night Service',
-      description: 'A defining moment to pray and launch into the New Year, 2027.'
-    }
-  ];
-
-  const handleRegister = (title) => {
-    alert(`Registration system coming soon for: ${title}`);
-  };
+const NoticeBoard = ({ notices = [], events = [] }) => {
+  const displayItems = notices.length > 0 ? notices : events;
 
   return (
-    <section id="events" className="py-20 px-6 max-w-7xl mx-auto">
-      {/* Section Header */}
-      <div className="text-center mb-12">
-        <span className="text-[#7E57C2] font-bold text-sm tracking-widest uppercase">
-          Stay Connected
-        </span>
-        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mt-2">
-          Upcoming Events & Notice Board
-        </h2>
-        <div className="w-16 h-1 bg-[#00A8E8] mx-auto mt-4 rounded-full"></div>
-      </div>
+    <section id="events" className="py-16 px-6 bg-sky-50/50">
+      <div className="max-w-7xl mx-auto space-y-8">
+        <div className="border-b border-gray-200 pb-4">
+          <span className="text-[#00A8E8] font-extrabold text-xs tracking-wider uppercase">Stay Updated</span>
+          <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight mt-1">Notice Board & Events</h2>
+        </div>
 
-      {/* Responsive 3-Column Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {upcomingEvents.map((event) => (
-          <EventCard
-            key={event.id}
-            date={event.date}
-            month={event.month}
-            title={event.title}
-            description={event.description}
-            onRegister={() => handleRegister(event.title)}
-          />
-        ))}
+        {displayItems.length === 0 ? (
+          <div className="text-center py-12 text-gray-400 text-sm italic">
+            No notices or upcoming events at this time.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {displayItems.map((item) => (
+              <div key={item.id} className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+                <div>
+                  {item.date && (
+                    <span className="inline-block bg-sky-100 text-[#00A8E8] text-[10px] font-bold px-2.5 py-1 rounded-md mb-3">
+                      📅 {item.date}
+                    </span>
+                  )}
+                  <h3 className="font-bold text-gray-900 text-lg leading-snug">{item.title || item.name}</h3>
+                  <p className="text-xs text-gray-600 mt-2 leading-relaxed">
+                    {item.description || item.details || item.subtitle || item.content}
+                  </p>
+                </div>
+                {item.image && (
+                  <img 
+                    src={item.image} 
+                    alt={item.title} 
+                    className="mt-4 w-full h-40 object-cover rounded-xl border border-gray-100" 
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
