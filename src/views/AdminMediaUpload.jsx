@@ -2,6 +2,57 @@
 import React, { useState } from 'react';
 import { saveToDB, deleteFromDB, fileToDataURL, STORES } from '../utils/indexedDB';
 
+// 1. Centralized codebase media mapping pointing to public/ directory
+export const DEFAULT_MODULE_MEDIA = {
+  [STORES.SERMONS]: {
+    id: 'default-sermon-1',
+    title: 'Divine Guidance & Help',
+    speaker: 'Rev. Dr. Felix Ineke',
+    role: 'Lead Pastor',
+    type: 'video',
+    url: '/media/help.mp4', // Relative path from public/
+    image: '/media/help.mp4',
+    date: new Date().toISOString().split('T')[0],
+    isDefault: true
+  },
+  [STORES.GALLERY]: {
+    id: 'default-gallery-1',
+    title: 'Choir Worship Session',
+    speaker: 'Worship Team',
+    name: 'Choir Worship Session',
+    role: 'Worship Team',
+    type: 'image',
+    url: '/gallery/choir.jpg', // Relative path from public/
+    image: '/gallery/choir.jpg',
+    date: new Date().toISOString().split('T')[0],
+    isDefault: true
+  },
+  [STORES.EVENTS]: {
+    id: 'default-event-1',
+    title: 'Annual Church Conference',
+    speaker: 'Church Board',
+    name: 'Annual Church Conference',
+    role: 'Main Auditorium',
+    type: 'image',
+    url: '/events/conference.jpg', // Relative path from public/
+    image: '/events/conference.jpg',
+    date: new Date().toISOString().split('T')[0],
+    isDefault: true
+  },
+  [STORES.LEADERSHIP]: {
+    id: 'default-leader-1',
+    title: 'Rev. Dr. Felix Ineke',
+    speaker: 'Lead Pastor',
+    name: 'Rev. Dr. Felix Ineke',
+    role: 'Lead Pastor',
+    type: 'image',
+    url: '/leadership/pastor.jpg', // Relative path from public/
+    image: '/leadership/pastor.jpg',
+    date: new Date().toISOString().split('T')[0],
+    isDefault: true
+  }
+};
+
 const AdminMediaUpload = () => {
   const [targetStore, setTargetStore] = useState(STORES.SERMONS);
   const [title, setTitle] = useState('');
@@ -10,43 +61,65 @@ const AdminMediaUpload = () => {
   const [mediaUrl, setMediaUrl] = useState('');
   const [mediaFile, setMediaFile] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSeeding, setIsSeeding] = useState(false);
+
+  // Automatically seed all codebase URLs into IndexedDB
+  const handleSeedDefaults = async () => {
+    setIsSeeding(true);
+    try {
+      const storesToSeed = [STORES.SERMONS, STORES.GALLERY, STORES.EVENTS, STORES.LEADERSHIP];
+      for (const storeKey of storesToSeed) {
+        await saveToDB(storeKey, DEFAULT_MODULE_MEDIA[storeKey]);
+      }
+      alert("All default codebase media paths (Sermons, Gallery, Events, Leadership) synced successfully!");
+    } catch (err) {
+      console.error("Failed to seed default media:", err);
+      alert("Error initializing default media files.");
+    } finally {
+      setIsSeeding(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!title) return alert("Please provide a title or name.");
+    
+    // Fallback to codebase default relative path for selected target store if mediaUrl is blank
+    const fallbackPath = DEFAULT_MODULE_MEDIA[targetStore]?.url || '';
+    let finalUrl = mediaUrl || fallbackPath;
 
     setIsSaving(true);
     try {
-      let finalUrl = mediaUrl;
-
       if (mediaFile) {
         finalUrl = await fileToDataURL(mediaFile);
       }
 
       if (!finalUrl) {
-        alert("Please upload a file or enter a valid URL.");
+        alert("Please upload a file or specify a media URL.");
         setIsSaving(false);
         return;
       }
 
       const itemToSave = {
-        id: Date.now(), // Unique ID
-        title,
-        speaker: speakerOrRole, // Fits Sermons/Leadership
-        name: title,            // Generic backup for Leadership/Gallery
-        role: speakerOrRole,
+        id: Date.now(),
+        title: title || DEFAULT_MODULE_MEDIA[targetStore]?.title,
+        speaker: speakerOrRole || DEFAULT_MODULE_MEDIA[targetStore]?.speaker,
+        name: title || DEFAULT_MODULE_MEDIA[targetStore]?.name,
+        role: speakerOrRole || DEFAULT_MODULE_MEDIA[targetStore]?.role,
         type: mediaType,
         url: finalUrl,
-        image: finalUrl,        // Backup field for Gallery/Leadership
+        image: finalUrl,
         date: new Date().toISOString().split('T')[0],
         isDefault: false
       };
 
-      // Save to IndexedDB using target store
+      // Save new uploaded item
       await saveToDB(targetStore, itemToSave);
 
-      // Clean up local defaults if present
-      await deleteFromDB(targetStore, 1);
+      // Clean default demo item if present
+      await deleteFromDB(targetStore, 'default-sermon-1');
+      await deleteFromDB(targetStore, 'default-gallery-1');
+      await deleteFromDB(targetStore, 'default-event-1');
+      await deleteFromDB(targetStore, 'default-leader-1');
 
       alert(`Successfully added to ${targetStore.toUpperCase()}!`);
 
@@ -65,14 +138,28 @@ const AdminMediaUpload = () => {
 
   return (
     <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-md max-w-xl mx-auto my-8">
-      <h3 className="text-xl font-bold text-gray-900 mb-4">Admin Media Uploader</h3>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-xl font-bold text-gray-900">Admin Media Uploader</h3>
+        <button
+          type="button"
+          onClick={handleSeedDefaults}
+          disabled={isSeeding}
+          className="text-xs bg-purple-50 text-[#7E57C2] font-semibold px-3 py-1.5 rounded-xl border border-purple-100 hover:bg-purple-100 cursor-pointer disabled:opacity-50"
+        >
+          {isSeeding ? 'Syncing...' : 'Sync All Default Media'}
+        </button>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Target Module</label>
           <select 
             value={targetStore}
-            onChange={(e) => setTargetStore(e.target.value)}
+            onChange={(e) => {
+              const selectedStore = e.target.value;
+              setTargetStore(selectedStore);
+              setMediaUrl(DEFAULT_MODULE_MEDIA[selectedStore]?.url || '');
+            }}
             className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#7E57C2]"
           >
             <option value={STORES.SERMONS}>Sermons / Word Archive</option>
@@ -86,10 +173,9 @@ const AdminMediaUpload = () => {
           <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Title / Name</label>
           <input 
             type="text"
-            required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g. Divine Favor Sermon / Annual Conference"
+            placeholder={DEFAULT_MODULE_MEDIA[targetStore]?.title || "e.g. Divine Favor Sermon"}
             className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#7E57C2]"
           />
         </div>
@@ -100,7 +186,7 @@ const AdminMediaUpload = () => {
             type="text"
             value={speakerOrRole}
             onChange={(e) => setSpeakerOrRole(e.target.value)}
-            placeholder="e.g. Rev. Dr. Felix Ineke"
+            placeholder={DEFAULT_MODULE_MEDIA[targetStore]?.speaker || "e.g. Rev. Dr. Felix Ineke"}
             className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#7E57C2]"
           />
         </div>
@@ -131,12 +217,12 @@ const AdminMediaUpload = () => {
         <div className="text-center text-xs text-gray-400 font-bold">OR</div>
 
         <div>
-          <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Direct Media / Image URL</label>
+          <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Direct Media / Image Relative Path</label>
           <input 
-            type="url"
+            type="text"
             value={mediaUrl}
             onChange={(e) => setMediaUrl(e.target.value)}
-            placeholder="https://..."
+            placeholder={DEFAULT_MODULE_MEDIA[targetStore]?.url || "/media/help.mp4"}
             className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#7E57C2]"
           />
         </div>

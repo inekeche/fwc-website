@@ -1,18 +1,28 @@
 // src/components/Navbar.jsx
 import React, { useState } from 'react';
 
-const Navbar = ({ onOpenGiveModal, isAdminView, onToggleAdmin }) => {
+const Navbar = ({ onOpenGiveModal }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [logoError, setLogoError] = useState(false);
 
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         
         {/* Brand / Logo */}
-        <a href="#home" className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-[#00A8E8] text-white rounded-full flex items-center justify-center font-extrabold text-xl shadow-sm">
-            †
-          </div>
+        <a href="#home" className="flex items-center space-x-3 group">
+          {!logoError ? (
+            <img
+              src="/gallery/fwc.jpg"
+              alt="FWC Logo"
+              className="w-12 h-12 rounded-full object-cover border-2 border-sky-100 shadow-sm group-hover:scale-105 transition-transform"
+              onError={() => setLogoError(true)}
+            />
+          ) : (
+            <div className="w-10 h-10 bg-[#00A8E8] text-white rounded-full flex items-center justify-center font-extrabold text-xl shadow-sm">
+              †
+            </div>
+          )}
           <div>
             <span className="font-extrabold text-lg text-gray-900 tracking-tight block leading-none">
               FWC Church
@@ -33,21 +43,8 @@ const Navbar = ({ onOpenGiveModal, isAdminView, onToggleAdmin }) => {
           <a href="#contact" className="hover:text-[#00A8E8] transition-colors">Contact</a>
         </nav>
 
-        {/* Action Buttons & Admin Toggle */}
+        {/* Action Button */}
         <div className="hidden md:flex items-center space-x-3">
-          {/* Admin Switch Button */}
-          <button
-            onClick={onToggleAdmin}
-            className={`text-xs font-bold px-3 py-2 rounded-xl transition-all cursor-pointer border ${
-              isAdminView
-                ? 'bg-purple-100 text-[#7E57C2] border-purple-300 hover:bg-purple-200'
-                : 'bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200'
-            }`}
-            title="Toggle Admin Mode (or press Ctrl + Shift + A)"
-          >
-            {isAdminView ? '🌐 View Public Site' : '🔒 Admin Portal'}
-          </button>
-
           {/* Give Button */}
           <button
             onClick={onOpenGiveModal}
@@ -59,13 +56,6 @@ const Navbar = ({ onOpenGiveModal, isAdminView, onToggleAdmin }) => {
 
         {/* Mobile Hamburger Button */}
         <div className="md:hidden flex items-center gap-2">
-          <button
-            onClick={onToggleAdmin}
-            className="text-xs font-bold px-2 py-1.5 rounded-lg bg-gray-100 text-gray-700"
-          >
-            {isAdminView ? 'Site' : 'Admin'}
-          </button>
-
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="text-gray-700 focus:outline-none p-2"

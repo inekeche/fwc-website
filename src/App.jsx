@@ -2,15 +2,29 @@
 import React, { useState, useEffect } from 'react';
 import NoticeBoard from './views/NoticeBoard';
 import Gallery from './views/Gallery';
-import MediaArchive from './views/MediaArchive';
+import Sermons from './views/Sermons';
 import Contact from './views/Contact';
 import AboutUs from './views/AboutUs';
 import AdminDashboard from './views/AdminDashboard';
 import GiveModal from './components/GiveModal';
 import Navbar from './components/Navbar';
 
-// Environment variable check for Vite (or process.env.REACT_APP_ENABLE_ADMIN for CRA)
 const ENABLE_ADMIN = import.meta.env.VITE_ENABLE_ADMIN === 'true';
+
+// Increment this version whenever you update default items in code to invalidate old cached data
+const APP_VERSION = 'v1.0.1';
+
+// Single clean default media item pointing to public/media/help.mp4
+const DEFAULT_MEDIA = [
+  {
+    id: 'sermon-help-mp4',
+    title: 'What will you do with Marvelous Help?',
+    speaker: 'Rev. Dr. Nath Mc-Abraham Inajoh',
+    type: 'video',
+    url: '/media/help.mp4',
+    date: '2026-07-29'
+  }
+];
 
 function App() {
   const [isAdminView, setIsAdminView] = useState(false);
@@ -18,10 +32,21 @@ function App() {
   const [activePhraseIndex, setActivePhraseIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Enable URL query param toggle ONLY if ENABLE_ADMIN is true
+  // Auto-clear stale LocalStorage whenever APP_VERSION changes
+  useEffect(() => {
+    const savedVersion = localStorage.getItem('fwc_app_version');
+    if (savedVersion !== APP_VERSION) {
+      localStorage.removeItem('fwc_media');
+      localStorage.removeItem('fwc_notices');
+      localStorage.removeItem('fwc_gallery');
+      localStorage.removeItem('fwc_leaders');
+      localStorage.setItem('fwc_app_version', APP_VERSION);
+      window.location.reload();
+    }
+  }, []);
+
   useEffect(() => {
     if (!ENABLE_ADMIN) return;
-
     const params = new URLSearchParams(window.location.search);
     const adminParam = params.get('Admin') || params.get('admin');
     if (adminParam === 'true') {
@@ -29,13 +54,19 @@ function App() {
     }
   }, []);
 
-  // Safe LocalStorage Initializers
+  // Safe LocalStorage Initializer: Always falls back to DEFAULT_MEDIA if empty or stale
   const [mediaItems, setMediaItems] = useState(() => {
     try {
       const saved = localStorage.getItem('fwc_media');
-      return saved ? JSON.parse(saved) : [];
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+      return DEFAULT_MEDIA;
     } catch (e) {
-      return [];
+      return DEFAULT_MEDIA;
     }
   });
 
@@ -118,22 +149,19 @@ function App() {
     return () => clearInterval(interval);
   }, [dynamicPhrases.length]);
 
-  // Keyboard shortcut: Ctrl + Shift + A (Only works if ENABLE_ADMIN is true)
   useEffect(() => {
     if (!ENABLE_ADMIN) return;
-
     const handleKeyDown = (e) => {
       if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
         e.preventDefault();
         setIsAdminView((prev) => !prev);
       }
     };
-
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // ADD / UPDATE Handlers
+  // Handlers
   const handleSaveMedia = (item) => {
     setMediaItems((prev) => {
       const exists = prev.some((i) => i.id === item.id);
@@ -162,7 +190,6 @@ function App() {
     });
   };
 
-  // DELETE Handlers
   const handleDeleteMedia = (id) => setMediaItems((prev) => prev.filter((i) => i.id !== id));
   const handleDeleteNotice = (id) => setNoticeItems((prev) => prev.filter((i) => i.id !== id));
   const handleDeleteGallery = (id) => setGalleryItems((prev) => prev.filter((i) => i.id !== id));
@@ -216,7 +243,6 @@ function App() {
               
               <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mt-6 tracking-tight leading-tight min-h-[140px] md:min-h-[120px]">
                 <span className="block mb-2 text-gray-900">Creation Palace,</span>
-                
                 <span className={`inline-block transition-all duration-300 transform ${
                   isTransitioning ? 'opacity-0 scale-95 translate-y-2 blur-sm' : 'opacity-100 scale-100 translate-y-0'
                 }`}>
@@ -234,7 +260,7 @@ function App() {
               </p>
               
               <div className="mt-8 flex justify-center gap-4">
-                <a href="#media" className="inline-block bg-white border-2 border-[#00A8E8] text-gray-800 hover:bg-[#00A8E8] hover:text-white font-bold px-6 py-3 rounded-full transition-all duration-200 shadow-md">
+                <a href="#media" className="inline-block bg-[#00A8E8] hover:bg-[#0086ba] text-white font-bold px-6 py-3 rounded-full transition-all duration-200 shadow-md">
                   Watch Services
                 </a>
                 <button onClick={() => setIsGiveModalOpen(true)} className="bg-white hover:bg-gray-50 text-gray-800 font-semibold px-6 py-3 rounded-full shadow-sm border border-gray-200 transition-all cursor-pointer">
@@ -247,7 +273,7 @@ function App() {
           <AboutUs leaders={leaders} />
           <NoticeBoard notices={noticeItems} events={noticeItems} />
           <Gallery items={galleryItems} gallery={galleryItems} images={galleryItems} />
-          <MediaArchive media={mediaItems} sermons={mediaItems} />
+          <Sermons sermons={mediaItems} media={mediaItems} />
           <Contact />
         </main>
       )}
