@@ -1,9 +1,31 @@
 // src/components/Navbar.jsx
 import React, { useState } from 'react';
 
+// Robust asset URL resolver to prevent broken paths or duplicates
+const resolveAssetUrl = (path) => {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:') || path.startsWith('data:')) {
+    return path;
+  }
+  
+  const baseUrl = import.meta.env.BASE_URL || '/';
+  
+  // Prevent duplicating base URL if already present
+  if (baseUrl !== '/' && path.startsWith(baseUrl)) {
+    return path;
+  }
+  
+  const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  
+  return `${cleanBase}${cleanPath}`;
+};
+
 const Navbar = ({ onOpenGiveModal }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [logoError, setLogoError] = useState(false);
+
+  const logoSrc = resolveAssetUrl('gallery/fwc.jpg');
 
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
@@ -13,10 +35,13 @@ const Navbar = ({ onOpenGiveModal }) => {
         <a href="#home" className="flex items-center space-x-3 group">
           {!logoError ? (
             <img
-              src="/gallery/fwc.jpg"
+              src={logoSrc}
               alt="FWC Logo"
               className="w-12 h-12 rounded-full object-cover border-2 border-sky-100 shadow-sm group-hover:scale-105 transition-transform"
-              onError={() => setLogoError(true)}
+              onError={(e) => {
+                console.error("Navbar logo failed to load:", logoSrc);
+                setLogoError(true);
+              }}
             />
           ) : (
             <div className="w-10 h-10 bg-[#00A8E8] text-white rounded-full flex items-center justify-center font-extrabold text-xl shadow-sm">
@@ -45,7 +70,6 @@ const Navbar = ({ onOpenGiveModal }) => {
 
         {/* Action Button */}
         <div className="hidden md:flex items-center space-x-3">
-          {/* Give Button */}
           <button
             onClick={onOpenGiveModal}
             className="bg-[#7E57C2] hover:bg-[#6c48ab] text-white text-xs font-bold px-5 py-2.5 rounded-full shadow-sm transition-all cursor-pointer"

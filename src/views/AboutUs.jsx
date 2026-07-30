@@ -1,19 +1,44 @@
 // src/views/AboutUs.jsx
 import React from 'react';
 
-// Static fallback data from codebase
+// Robust asset URL resolver that prevents duplicate base paths
+const resolveAssetUrl = (path) => {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:') || path.startsWith('data:')) {
+    return path;
+  }
+  
+  const baseUrl = import.meta.env.BASE_URL || '/';
+  
+  // Prevent duplicating the base path if already present
+  if (baseUrl !== '/' && path.startsWith(baseUrl)) {
+    return path;
+  }
+  
+  const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  
+  return `${cleanBase}${cleanPath}`;
+};
+
 const STATIC_LEADERSHIP_FALLBACK = [
   {
     id: 'default-leader-1',
-    name: 'Rev. Dr. Felix Ineke',
-    role: 'Lead Pastor',
-    profile: 'Leading Family Worship Center with faith, vision, and a dedication to spiritual growth.',
-    image: '/leadership/pastor.jpg'
+    name: 'Rev. Dr. Nath Mc-Abraham Inajoh',
+    role: 'Senior Pastor',
+    profile: 'Leading Family Worship Center with passion, vision, and dedication to spiritual growth.',
+    image: 'leadership/pastor.jpg'
+  },
+  {
+    id: 'default-leader-2',
+    name: 'Rev Dorathy Inajoh',
+    role: 'Associate Pastor',
+    profile: 'Serving and supporting the spiritual growth and ministry of Family Worship Center.',
+    image: 'leadership/ccd.jpg' // Change this to your second image, e.g. 'leadership/pastor2.jpg'
   }
 ];
 
 const AboutUs = ({ leaders: propsLeaders = [] }) => {
-  // 1. Prioritize props if passed directly, otherwise fallback to static data
   const leadersList = propsLeaders && propsLeaders.length > 0 
     ? propsLeaders 
     : STATIC_LEADERSHIP_FALLBACK;
@@ -21,7 +46,6 @@ const AboutUs = ({ leaders: propsLeaders = [] }) => {
   return (
     <section id="about" className="py-16 px-6 bg-white">
       <div className="max-w-7xl mx-auto space-y-12">
-        {/* Who We Are Header */}
         <div className="max-w-3xl border-b border-gray-100 pb-6">
           <span className="text-[#7E57C2] font-extrabold text-xs tracking-wider uppercase">Who We Are</span>
           <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight mt-1">About Family Worship Center</h2>
@@ -30,7 +54,6 @@ const AboutUs = ({ leaders: propsLeaders = [] }) => {
           </p>
         </div>
 
-        {/* Leadership Section */}
         <div>
           <h3 className="text-xl font-bold text-gray-900 mb-6">Our Leadership</h3>
 
@@ -39,7 +62,8 @@ const AboutUs = ({ leaders: propsLeaders = [] }) => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {leadersList.map((leader, idx) => {
-                const photo = leader.image || leader.url || leader.photo || '/leadership/pastor.jpg';
+                const rawPhoto = leader.image || leader.url || leader.photo || 'leadership/pastor.jpg';
+                const photo = resolveAssetUrl(rawPhoto);
                 const profileDesc = leader.profile || leader.bio || leader.details || leader.description;
                 const leaderName = leader.name || leader.title;
                 const leaderRole = leader.role || leader.speaker || leader.subtitle;
@@ -49,7 +73,6 @@ const AboutUs = ({ leaders: propsLeaders = [] }) => {
                     key={leader.id || idx} 
                     className="bg-sky-50/40 rounded-2xl p-6 border border-sky-100 flex flex-col items-center text-center shadow-sm hover:shadow-md transition-all"
                   >
-                    {/* Bolder & Larger Image Container */}
                     <img 
                       src={photo} 
                       alt={leaderName} 

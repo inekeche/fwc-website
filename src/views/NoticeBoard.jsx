@@ -6,7 +6,7 @@ const STATIC_EVENT_FALLBACK = [
   {
     id: 'default-event-1',
     title: 'Sunday Worship Service',
-    date: 'Every Sunday | 9:00 AM',
+    date: 'Every Sunday | 8:30 AM',
     details: 'Join us for our flagship weekly service filled with powerful worship, prayer, and the Word.',
     image: ''
   }

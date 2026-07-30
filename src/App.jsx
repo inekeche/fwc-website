@@ -11,20 +11,78 @@ import Navbar from './components/Navbar';
 
 const ENABLE_ADMIN = import.meta.env.VITE_ENABLE_ADMIN === 'true';
 
-// Increment this version whenever you update default items in code to invalidate old cached data
-const APP_VERSION = 'v1.0.1';
+// Dynamically resolve base URL for GitHub Pages deployment
+const BASE = import.meta.env.BASE_URL;
 
-// Single clean default media item pointing to public/media/help.mp4
+// Bump version to v1.0.4 to force-refresh local storage with exact file paths
+const APP_VERSION = 'v1.0.4';
+
+// Helper function to resolve paths cleanly across base URLs
+const resolveAssetUrl = (path) => {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:') || path.startsWith('data:')) {
+    return path;
+  }
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  return `${BASE}${cleanPath}`;
+};
+
+// Default Media Items
 const DEFAULT_MEDIA = [
   {
     id: 'sermon-help-mp4',
     title: 'What will you do with Marvelous Help?',
     speaker: 'Rev. Dr. Nath Mc-Abraham Inajoh',
     type: 'video',
-    url: '/media/help.mp4',
+    url: resolveAssetUrl('media/help.mp4'),
     date: '2026-07-29'
   }
 ];
+
+// Default Gallery Items (Matching your public/gallery folder)
+const DEFAULT_GALLERY = [
+  {
+    id: 'gal-1',
+    title: 'Sunday Worship Experience',
+    category: 'Services',
+    url: resolveAssetUrl('gallery/worship.jpg'),
+    date: '2026-07-29'
+  },
+  {
+    id: 'gal-2',
+    title: 'Choir Ministration',
+    category: 'Music',
+    url: resolveAssetUrl('gallery/choir.jpg'),
+    date: '2026-07-29'
+  },
+  {
+    id: 'gal-3',
+    title: 'FWC Community',
+    category: 'Events',
+    url: resolveAssetUrl('gallery/fwc.jpg'),
+    date: '2026-07-29'
+  }
+];
+
+// Default Leadership Items (Matching public/leadership/pastor.jpg)
+const DEFAULT_LEADERS = [
+  {
+    id: 'lead-1',
+    name: 'Rev. Dr. Nath Mc-Abraham Inajoh',
+    role: 'Presiding Pastor',
+    image: resolveAssetUrl('leadership/pastor.jpg'),
+    bio: 'Leading Family Worship Center with passion and vision.'
+  },
+
+  {
+    id: 'lead-2',
+    name: 'Rev. Dorathy Inajoh',
+    role: 'Associate Pastor',
+    image: resolveAssetUrl('leadership/ccd.jpg'),
+    bio: 'Serving and supporting the spiritual growth and ministry of Family Worship Center.'
+  }
+];
+
 
 function App() {
   const [isAdminView, setIsAdminView] = useState(false);
@@ -54,15 +112,13 @@ function App() {
     }
   }, []);
 
-  // Safe LocalStorage Initializer: Always falls back to DEFAULT_MEDIA if empty or stale
+  // Safe LocalStorage Initializer with dynamic fallback defaults
   const [mediaItems, setMediaItems] = useState(() => {
     try {
       const saved = localStorage.getItem('fwc_media');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
-        }
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
       return DEFAULT_MEDIA;
     } catch (e) {
@@ -82,18 +138,26 @@ function App() {
   const [galleryItems, setGalleryItems] = useState(() => {
     try {
       const saved = localStorage.getItem('fwc_gallery');
-      return saved ? JSON.parse(saved) : [];
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+      return DEFAULT_GALLERY;
     } catch (e) {
-      return [];
+      return DEFAULT_GALLERY;
     }
   });
 
   const [leaders, setLeaders] = useState(() => {
     try {
       const saved = localStorage.getItem('fwc_leaders');
-      return saved ? JSON.parse(saved) : [];
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+      return DEFAULT_LEADERS;
     } catch (e) {
-      return [];
+      return DEFAULT_LEADERS;
     }
   });
 
@@ -325,7 +389,7 @@ function App() {
         </div>
 
         <div className="pt-8 text-center text-xs text-gray-500">
-          <p>FWC-CopyRight@2026, WebApp by inekonubifelix@gmail.com (Presidoo)</p>
+          <p>FWC-CopyRight@2026, WebApp by inekeonubifelix@gmail.com (Presidoo)</p>
         </div>
       </footer>
 

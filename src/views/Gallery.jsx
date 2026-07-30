@@ -1,26 +1,42 @@
-// src/views/Gallery.jsx (or src/components/Gallery.jsx)
+// src/views/Gallery.jsx
 import React from 'react';
 
-// Static fallback array for Gallery module
+const resolveAssetUrl = (path) => {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:') || path.startsWith('data:')) {
+    return path;
+  }
+  
+  const baseUrl = import.meta.env.BASE_URL || '/';
+  
+  if (baseUrl !== '/' && path.startsWith(baseUrl)) {
+    return path;
+  }
+  
+  const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  
+  return `${cleanBase}${cleanPath}`;
+};
+
 const FALLBACK_GALLERY = [
   {
     id: 'static-1',
     title: 'Worship Service',
-    image: '/gallery/worship.jpg',
-    url: '/gallery/worship.jpg',
+    image: 'gallery/worship.jpg',
+    url: 'gallery/worship.jpg',
     date: new Date().toISOString().split('T')[0]
   },
   {
     id: 'static-2',
     title: 'Sunday Celebration',
-    image: '/gallery/choir.jpg',
-    url: '/gallery/choir.jpg',
+    image: 'gallery/choir.jpg',
+    url: 'gallery/choir.jpg',
     date: new Date().toISOString().split('T')[0]
   }
 ];
 
 const Gallery = ({ items = [], gallery = [], images = [] }) => {
-  // 1. Prioritize props passed down from App.jsx, otherwise fallback
   const passedItems = items.length > 0 ? items : gallery.length > 0 ? gallery : images;
   const activeItems = passedItems.length > 0 ? passedItems : FALLBACK_GALLERY;
 
@@ -34,7 +50,9 @@ const Gallery = ({ items = [], gallery = [], images = [] }) => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {activeItems.map((item, idx) => {
-            const imageSrc = item.image || item.url;
+            const rawSrc = item.image || item.url;
+            const imageSrc = resolveAssetUrl(rawSrc);
+
             return (
               <div 
                 key={item.id || idx} 
