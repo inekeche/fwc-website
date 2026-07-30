@@ -18,9 +18,18 @@ const Sermons = ({ sermons = [], items = [], media = [] }) => {
   const filteredList = rawList.filter((item) => {
     if (filter === 'all') return true;
     const mediaUrl = (item.url || item.mediaUrl || item.src || '').toLowerCase();
-    const itemType = (item.type || (mediaUrl.includes('.mp4') ? 'video' : 'audio')).toLowerCase();
+    const itemType = (item.type || (mediaUrl.includes('.mp4') || mediaUrl.includes('youtube.com') || mediaUrl.includes('youtu.be') ? 'video' : 'audio')).toLowerCase();
     return itemType === filter;
   });
+
+  // Helper to format YouTube URLs into Embed URLs
+  const formatYouTubeUrl = (url) => {
+    if (!url) return '';
+    if (url.includes('youtube.com/embed/')) return url;
+    if (url.includes('watch?v=')) return url.replace('watch?v=', 'embed/').split('&')[0];
+    if (url.includes('youtu.be/')) return url.replace('youtu.be/', 'youtube.com/embed/');
+    return url;
+  };
 
   return (
     <section id="media" className="py-16 px-6 bg-white">
@@ -61,8 +70,9 @@ const Sermons = ({ sermons = [], items = [], media = [] }) => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredList.map((item, idx) => {
-              const mediaUrl = item.url || item.mediaUrl || item.src;
-              const isVideo = item.type === 'video' || (mediaUrl && mediaUrl.toLowerCase().includes('.mp4'));
+              const rawMediaUrl = item.url || item.mediaUrl || item.src || '';
+              const isYouTube = rawMediaUrl.toLowerCase().includes('youtube.com') || rawMediaUrl.toLowerCase().includes('youtu.be');
+              const isVideo = item.type === 'video' || isYouTube || rawMediaUrl.toLowerCase().includes('.mp4');
 
               return (
                 <div
@@ -77,22 +87,30 @@ const Sermons = ({ sermons = [], items = [], media = [] }) => {
                       {item.title || 'Divine Help & Restoration'}
                     </h3>
                     <p className="text-xs text-gray-600 mt-1">
-                      {item.speaker || 'Rev. Dr. Felix Ineke'}
+                      {item.speaker || 'Rev. Dr. Nath Mc-Abraham Inajoh'}
                     </p>
                   </div>
 
                   <div className="mt-4">
-                    {isVideo ? (
+                    {isYouTube ? (
+                      <iframe
+                        src={formatYouTubeUrl(rawMediaUrl)}
+                        title={item.title || 'Sermon Video'}
+                        className="w-full h-48 md:h-52 rounded-xl shadow-inner border-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    ) : isVideo ? (
                       <video
                         controls
                         preload="metadata"
-                        src={mediaUrl}
+                        src={rawMediaUrl}
                         className="w-full h-48 object-cover rounded-xl bg-black shadow-inner"
                       >
                         Your browser does not support playing this video.
                       </video>
                     ) : (
-                      <audio controls src={mediaUrl} className="w-full mt-2" />
+                      <audio controls src={rawMediaUrl} className="w-full mt-2" />
                     )}
                   </div>
                 </div>
