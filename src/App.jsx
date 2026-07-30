@@ -34,10 +34,11 @@ const DEFAULT_MEDIA = [
     title: 'What will you do with Marvelous Help?',
     speaker: 'Rev. Dr. Nath Mc-Abraham Inajoh',
     type: 'video',
-    url: resolveAssetUrl('media/help.mp4'),
+    url: 'https://www.youtube.com/embed/k33PDV3TOKA',
     date: '2026-07-29'
   }
 ];
+  
 
 // Default Gallery Items (Matching your public/gallery folder)
 const DEFAULT_GALLERY = [
