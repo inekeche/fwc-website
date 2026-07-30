@@ -14,8 +14,8 @@ const ENABLE_ADMIN = import.meta.env.VITE_ENABLE_ADMIN === 'true';
 // Dynamically resolve base URL for GitHub Pages deployment
 const BASE = import.meta.env.BASE_URL;
 
-// Bump version to v1.0.4 to force-refresh local storage with exact file paths
-const APP_VERSION = 'v1.0.4';
+// Bump version to v1.0.5 to force-refresh local storage with YouTube embed URL & 2 pastors
+const APP_VERSION = 'v1.0.5';
 
 // Helper function to resolve paths cleanly across base URLs
 const resolveAssetUrl = (path) => {
@@ -27,7 +27,7 @@ const resolveAssetUrl = (path) => {
   return `${BASE}${cleanPath}`;
 };
 
-// Default Media Items
+// Default Media Items (Using embed format for YouTube)
 const DEFAULT_MEDIA = [
   {
     id: 'sermon-help-mp4',
@@ -38,7 +38,6 @@ const DEFAULT_MEDIA = [
     date: '2026-07-29'
   }
 ];
-  
 
 // Default Gallery Items (Matching your public/gallery folder)
 const DEFAULT_GALLERY = [
@@ -65,7 +64,7 @@ const DEFAULT_GALLERY = [
   }
 ];
 
-// Default Leadership Items (Matching public/leadership/pastor.jpg)
+// Default Leadership Items
 const DEFAULT_LEADERS = [
   {
     id: 'lead-1',
@@ -74,7 +73,6 @@ const DEFAULT_LEADERS = [
     image: resolveAssetUrl('leadership/pastor.jpg'),
     bio: 'Leading Family Worship Center with passion and vision.'
   },
-
   {
     id: 'lead-2',
     name: 'Rev. Dorathy Inajoh',
@@ -83,7 +81,6 @@ const DEFAULT_LEADERS = [
     bio: 'Serving and supporting the spiritual growth and ministry of Family Worship Center.'
   }
 ];
-
 
 function App() {
   const [isAdminView, setIsAdminView] = useState(false);
