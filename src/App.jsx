@@ -32,10 +32,37 @@ const DEFAULT_MEDIA = [
   {
     id: 'sermon-help-mp4',
     title: 'What will you do with Marvelous Help?',
-    speaker: 'Rev. Dr. Nath Mc-Abraham Inajoh',
+    speaker: 'Rev. Nath McAbraham-Inajoh',
     type: 'video',
     url: 'https://www.youtube.com/embed/k33PDV3TOKA',
     date: '2026-07-29'
+  },
+
+   {
+    id: 'Prayer-points-mp4',
+    title: 'Apostle Paul prayer pattern',
+    speaker: 'Rev. Nath McAbraham-Inajoh',
+    type: 'video',
+    url: 'https://www.youtube.com/watch?v=8ZVzfHwnH7Y&t=81s',
+    date: '2026-09-11'
+  },
+
+   {
+    id: 'Signs-Wonders-mp4',
+    title: 'You are the Signs and Wonders',
+    speaker: 'Rev. Nath McAbraham-Inajoh',
+    type: 'video',
+    url: 'https://www.youtube.com/watch?v=XwfFhyJzHFY&t=52s',
+    date: '2026-09-11'
+  },
+
+   {
+    id: 'Rep-Conf-mp4',
+    title: 'Repentance, Confession & Forgiveness',
+    speaker: 'Rev. Nath McAbraham-Inajoh',
+    type: 'video',
+    url: 'https://www.youtube.com/watch?v=1ynUHGaI7hY&t=82s',
+    date: '2026-06-29'
   }
 ];
 
@@ -68,16 +95,24 @@ const DEFAULT_GALLERY = [
 const DEFAULT_LEADERS = [
   {
     id: 'lead-1',
-    name: 'Rev. Dr. Nath Mc-Abraham Inajoh',
+    name: 'Rev. Nath McAbraham-Inajoh',
     role: 'Presiding Pastor',
-    image: resolveAssetUrl('leadership/pastor.jpg'),
+    image: resolveAssetUrl('leadership/pastor.jpeg'),
     bio: 'Leading Family Worship Center with passion and vision.'
   },
   {
     id: 'lead-2',
-    name: 'Rev. Dorathy Inajoh',
-    role: 'Associate Pastor',
+    name: 'Rev. Dorathy McAbraham-Inajoh',
+    role: 'Associate Pastor Admin',
     image: resolveAssetUrl('leadership/ccd.jpg'),
+    bio: 'Serving and supporting the spiritual growth and ministry of Family Worship Center.'
+  },
+
+  {
+    id: 'lead-3',
+    name: 'Rev. Patrick Ogbu',
+    role: 'Associate Pastor Groups',
+    image: resolveAssetUrl('leadership/pat.jpeg'),
     bio: 'Serving and supporting the spiritual growth and ministry of Family Worship Center.'
   }
 ];
@@ -304,7 +339,7 @@ function App() {
               </span>
               
               <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mt-6 tracking-tight leading-tight min-h-[140px] md:min-h-[120px]">
-                <span className="block mb-2 text-gray-900">Creation Palace,</span>
+                <span className="block mb-2 text-gray-900">Family of Greatness,</span>
                 <span className={`inline-block transition-all duration-300 transform ${
                   isTransitioning ? 'opacity-0 scale-95 translate-y-2 blur-sm' : 'opacity-100 scale-100 translate-y-0'
                 }`}>

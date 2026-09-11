@@ -23,24 +23,45 @@ const resolveAssetUrl = (path) => {
 
 const Navbar = ({ onOpenGiveModal }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [logoError, setLogoError] = useState(false);
+  const [cgmiLogoError, setCgmiLogoError] = useState(false);
+  const [fwcLogoError, setFwcLogoError] = useState(false);
 
-  const logoSrc = resolveAssetUrl('gallery/fwc.jpg');
+  const cgmiLogoSrc = resolveAssetUrl('gallery/cgmilogo.jpg');
+  const fwcLogoSrc = resolveAssetUrl('gallery/fwc.jpg');
 
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         
-        {/* Brand / Logo */}
-        <a href="#home" className="flex items-center space-x-3 group">
-          {!logoError ? (
+        {/* Brand / Logos */}
+        <a href="#home" className="flex items-center space-x-2 group">
+          
+          {/* CGMI Logo (First Logo) */}
+          {!cgmiLogoError ? (
             <img
-              src={logoSrc}
+              src={cgmiLogoSrc}
+              alt="CGMI Logo"
+              className="w-10 h-10 object-contain group-hover:scale-105 transition-transform"
+              onError={() => {
+                console.error("CGMI logo failed to load:", cgmiLogoSrc);
+                setCgmiLogoError(true);
+              }}
+            />
+          ) : (
+            <div className="w-10 h-10 bg-[#7E57C2] text-white rounded-full flex items-center justify-center font-extrabold text-sm shadow-sm">
+              CGMI
+            </div>
+          )}
+
+          {/* FWC Logo (Second Logo) */}
+          {!fwcLogoError ? (
+            <img
+              src={fwcLogoSrc}
               alt="FWC Logo"
-              className="w-12 h-12 rounded-full object-cover border-2 border-sky-100 shadow-sm group-hover:scale-105 transition-transform"
-              onError={(e) => {
-                console.error("Navbar logo failed to load:", logoSrc);
-                setLogoError(true);
+              className="w-11 h-11 rounded-full object-cover border-2 border-sky-100 shadow-sm group-hover:scale-105 transition-transform"
+              onError={() => {
+                console.error("FWC logo failed to load:", fwcLogoSrc);
+                setFwcLogoError(true);
               }}
             />
           ) : (
@@ -48,12 +69,14 @@ const Navbar = ({ onOpenGiveModal }) => {
               †
             </div>
           )}
-          <div>
+
+          {/* Text Branding */}
+          <div className="ml-1">
             <span className="font-extrabold text-lg text-gray-900 tracking-tight block leading-none">
-              FWC Church
+              Church of God Mission Int'l
             </span>
-            <span className="text-[10px] text-[#7E57C2] font-bold tracking-wider uppercase">
-              CGMi Creation Palace
+            <span className="text-[10px] text-[#7E57C2] font-bold tracking-wider block leading-none mt-1">
+              Family Worship Center Ajao Estate, Lagos, Nigeria
             </span>
           </div>
         </a>

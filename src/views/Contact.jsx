@@ -53,7 +53,7 @@ const Contact = () => {
             <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 space-y-6">
               <div>
                 <span className="text-xs font-bold text-[#00A8E8] uppercase tracking-wider">Our Location</span>
-                <h3 className="text-xl font-bold text-gray-900 mt-1">Creation Palace</h3>
+                <h3 className="text-xl font-bold text-gray-900 mt-1">Family of Greatness</h3>
                 <p className="text-sm text-gray-600 mt-2 leading-relaxed">
                   Family Worship Center, Church of God Mission International.<br />
                   14, Alhaji Lookman Atogbajeun, Chivita Link Rd, Ajao-Estate.<br />
